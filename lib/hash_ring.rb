@@ -41,6 +41,8 @@ require 'digest/md5'
 #  server = ring.get_node('my_key')
 #
 class HashRing
+  VERSION = '0.1'
+
   #
   # Creates a HashRing instance
   #

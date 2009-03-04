@@ -3,13 +3,14 @@ require 'rake/clean'
 require 'rake/packagetask'
 require 'rake/gempackagetask'
 require 'spec/rake/spectask'
+require 'fileutils'
 
 load 'hash_ring.gemspec'
 
 ###################################
 # Clean & Defaut Task
 ###################################
-CLEAN.include('pkg','tmp','rdoc')
+CLEAN.include('dist','tmp','rdoc')
 task :default => [:clean, :repackage]
 
 ###################################
@@ -21,24 +22,50 @@ Spec::Rake::SpecTask.new('spec') do |t|
 end
 
 ###################################
-# Packaging
+# Packaging - Thank you Sinatra
 ################################### 
-Rake::GemPackageTask.new($gemspec) do |pkg|
+# Load the gemspec using the same limitations as github
+def spec
+  @spec ||=
+    begin
+      require 'rubygems/specification'
+      data = File.read('hash_ring.gemspec')
+      spec = nil
+      Thread.new { spec = eval("$SAFE = 3\n#{data}") }.join
+      spec
+    end
 end
  
-Rake::PackageTask.new('hash_ring', '0.1') do |pkg|
-  pkg.need_zip = true
-  pkg.package_files = FileList[
-    'Rakefile',
-    '*.txt',
-    '*.rdoc',
-    'lib/**/*',
-    'spec/**/*'
-  ].to_a
+def package(ext='')
+  "dist/hash_ring-#{spec.version}" + ext
+end
+ 
+desc 'Build packages'
+task :package => %w[.gem .tar.gz].map {|e| package(e)}
+ 
+desc 'Build and install as local gem'
+task :install => package('.gem') do
+  sh "gem install #{package('.gem')}"
+end
+ 
+directory 'dist/'
+CLOBBER.include('dist')
+ 
+file package('.gem') => %w[dist/ hash_ring.gemspec] + spec.files do |f|
+  sh "gem build hash_ring.gemspec"
+  mv File.basename(f.name), f.name
+end
+ 
+file package('.tar.gz') => %w[dist/] + spec.files do |f|
+  sh <<-SH
+git archive \
+--prefix=hash_ring-#{source_version}/ \
+--format=tar \
+HEAD | gzip > #{f.name}
+SH
+end
 
-  class << pkg
-    def package_name
-      "#{@name}-#{@version}-src"
-    end
-  end
+def source_version
+  line = File.read('lib/hash_ring.rb')[/^\s*VERSION = .*/]
+  line.match(/.*VERSION = '(.*)'/)[1]
 end

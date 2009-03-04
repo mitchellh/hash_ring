@@ -21,6 +21,7 @@ Gem::Specification.new do |s|
   s.rubygems_version = '0.1'
 
   s.files = %w[
+    CREDITS
     LICENSE
     README.rdoc
     Rakefile

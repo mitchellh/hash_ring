@@ -2,6 +2,7 @@ require 'rake'
 require 'rake/clean'
 require 'rake/packagetask'
 require 'rake/gempackagetask'
+require 'rake/rdoctask'
 require 'spec/rake/spectask'
 require 'fileutils'
 
@@ -19,6 +20,26 @@ task :default => [:clean, :repackage]
 desc "Run all specs for hash_ring"
 Spec::Rake::SpecTask.new('spec') do |t|
   t.spec_files = FileList['spec/**/*.rb']
+end
+
+###################################
+# Docs
+###################################
+Rake::RDocTask.new do |rd|
+  rd.main = 'README.rdoc'
+ 
+  rd.rdoc_dir = 'doc'
+ 
+  rd.rdoc_files.include(
+    'README.rdoc',
+    'LICENSE',
+    'CREDITS',
+    'lib/**/*.rb')
+ 
+  rd.title = 'hash_ring'
+ 
+  rd.options << '-N' # line numbers
+  rd.options << '-S' # inline source
 end
 
 ###################################

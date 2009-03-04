@@ -1,5 +1,7 @@
 = hash_ring
 
+== Background
+
 hash_ring is a pure Ruby implementation of consistent hashing. 
 hash_ring is based on the original Python code written by
 Amir Salihefendic. A comprehensive blog post detailing the methods
@@ -8,4 +10,15 @@ URL:
 
 http://amix.dk/blog/viewEntry/19367
 
+== Usage
 
+  memcache_servers = ['192.168.0.111:14107',
+                      '192.168.0.112:14107',
+                      '192.168.0.113:14108']
+ 
+  # Since server 1 has double the RAM, lets weight it
+  # twice as much to get twice the keys. This is optional
+  weights = { '192.168.0.111' => 2 }
+
+  ring = HashRing.new(memcache_servers, weights)
+  server = ring.get_node('my_key')

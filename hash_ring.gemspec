@@ -3,7 +3,7 @@ Gem::Specification.new do |s|
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
  
   s.name = 'hash_ring'
-  s.version = '0.1'
+  s.version = '0.2'
   s.date = '2009-03-04'
  
   s.description = "hash_ring implementation in Ruby"
@@ -18,7 +18,7 @@ Gem::Specification.new do |s|
   s.homepage = 'http://github.com/mitchellh/hash_ring/'
   s.rdoc_options = ["--line-numbers", "--inline-source", "--title", "hash_ring", "--main", "README.rdoc"]
   s.require_paths = %w[lib]
-  s.rubygems_version = '0.1'
+  s.rubygems_version = '0.2'
 
   s.files = %w[
     CREDITS

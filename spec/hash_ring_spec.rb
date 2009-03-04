@@ -9,6 +9,12 @@ WEIGHTED_ERROR_BOUND = 0.05
 describe HashRing do
   include HashRingHelpers
 
+  it "should allow the creation of a hash ring with non-string objects" do
+    lambda do
+      ring = HashRing.new([HashRing.new('a'), HashRing.new('b')])
+    end.should_not raise_error
+  end
+
   describe "bisection" do
     before do
       @ring = HashRing.new(['a'])

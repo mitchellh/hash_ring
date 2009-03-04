@@ -41,7 +41,7 @@ require 'digest/md5'
 #  server = ring.get_node('my_key')
 #
 class HashRing
-  VERSION = '0.1'
+  VERSION = '0.2'
 
   #
   # Creates a HashRing instance
@@ -74,11 +74,11 @@ class HashRing
     total_weight = 0
     
     @nodes.each do |node|
-      total_weight += @weights[node] || 1
+      total_weight += @weights[node.to_s] || 1
     end
 
     @nodes.each do |node|
-      weight = @weights[node] || 1
+      weight = @weights[node.to_s] || 1
       factor = ((40 * @nodes.length * weight) / total_weight.to_f).floor.to_i
 
       factor.times do |j|

@@ -67,7 +67,9 @@ class HashRing
   end
 
   #
-  # Generates the circle
+  # Generates the ring.
+  #
+  # This is for internal use only.
   def _generate_circle
     total_weight = 0
     
@@ -153,15 +155,23 @@ class HashRing
     return self._hash_val(b_key) { |x| x }
   end
 
+  #
+  # Converts a hex digest to a value based on certain parts of 
+  # the digest determined by the block. The block will be called
+  # 4 times (with paramter 3, then 2, then 1, then 0) and is 
+  # expected to return a valid index into the digest with which
+  # to pull a single character from.
+  #
+  # This function is meant for use internally.
   def _hash_val(b_key, &block)
     return ((b_key[block.call(3)] << 24) | 
             (b_key[block.call(2)] << 16) | 
             (b_key[block.call(1)] << 8) | 
             (b_key[block.call(0)])) 
- end
+  end
 
   #
-  # Returns raw MD5 digest given a key
+  # Returns raw MD5 digest of a key.
   def _hash_digest(key)
     m = Digest::MD5.new
     m.update(key)
@@ -172,7 +182,11 @@ class HashRing
   end
 
   #
-  # Bisect an array
+  # Bisects an array, returning the index where the key would
+  # need to be inserted to maintain sorted order of the array.
+  #
+  # That being said, it is assumed that the array is already
+  # in sorted order before calling this method.
   def bisect(arr, key)
     arr.each_index do |i|
       return i if key < arr[i]

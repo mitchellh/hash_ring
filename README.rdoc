@@ -12,6 +12,9 @@ http://amix.dk/blog/viewEntry/19367
 
 == Usage
 
+  require 'rubygems'
+  require 'hash_ring'
+
   memcache_servers = ['192.168.0.111:14107',
                       '192.168.0.112:14107',
                       '192.168.0.113:14108']
@@ -22,3 +25,7 @@ http://amix.dk/blog/viewEntry/19367
 
   ring = HashRing.new(memcache_servers, weights)
   server = ring.get_node('my_key')
+
+== Installation
+
+  sudo gem install mitchellh-hash_ring

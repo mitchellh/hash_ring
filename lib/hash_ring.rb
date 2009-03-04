@@ -75,8 +75,6 @@ class HashRing
     @_sorted_keys.sort!
   end
 
-  def sorted_keys; @_sorted_keys; end
-
   def _hash_val(b_key, &block)
     return ((b_key[block.call(3)] << 24) | 
             (b_key[block.call(2)] << 16) | 
@@ -94,4 +92,7 @@ class HashRing
     # of a string in Ruby converts to ordinal value
     return m.digest
   end
+  
+  # For testing mainly
+  def sorted_keys; @_sorted_keys; end
 end

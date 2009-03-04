@@ -75,6 +75,43 @@ class HashRing
     @_sorted_keys.sort!
   end
 
+  #
+  # Given a string key a corresponding node is returned. If the
+  # ring is empty, nil is returned.
+  def get_node(string_key)
+    pos = self.get_node_pos(string_key)
+    return nil if pos.nil?
+
+    return @ring[@_sorted_keys[pos]]
+  end
+
+  #
+  # Given a string key a corresponding node's position in the ring
+  # is returned. Nil is returned if the ring is empty.
+  def get_node_pos(string_key)
+    return nil if @ring.empty?
+
+    key = self.gen_key(string_key)
+    nodes = @_sorted_keys
+    pos = bisect(nodes, key)
+
+    if pos == nodes.length
+      return 0
+    else
+      return pos
+    end
+  end
+
+  #
+  # Given a string key this returns a long value. This long value
+  # represents a location on the ring.
+  #
+  # MD5 is used currently.
+  def gen_key(string_key)
+    b_key = self._hash_digest(string_key)
+    return self._hash_val(b_key) { |x| x }
+  end
+
   def _hash_val(b_key, &block)
     return ((b_key[block.call(3)] << 24) | 
             (b_key[block.call(2)] << 16) | 
@@ -91,6 +128,16 @@ class HashRing
     # No need to ord each item since ordinary array access
     # of a string in Ruby converts to ordinal value
     return m.digest
+  end
+
+  #
+  # Bisect an array
+  def bisect(arr, key)
+    arr.each_index do |i|
+      return i if key < arr[i]
+    end
+
+    return arr.length
   end
   
   # For testing mainly

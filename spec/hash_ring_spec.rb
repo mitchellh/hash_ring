@@ -1,7 +1,142 @@
 require File.dirname(__FILE__) + '/spec_base'
 require 'digest/md5'
 
+# Basic constants
+UNWEIGHTED_RUNS = 1000
+UNWEIGHTED_ERROR_BOUND = 0.05
+WEIGHTED_RUNS = 1000
+WEIGHTED_ERROR_BOUND = 0.05
+
 describe HashRing do
+  describe "bisection" do
+    before do
+      @ring = HashRing.new(['a'])
+      @test_array = [10,20,30]
+    end
+
+    it "should return 0 if it less than the first element" do
+      @ring.bisect(@test_array, 5).should eql(0)
+    end
+
+    it "should return the index it should go into to maintain order" do
+      @ring.bisect(@test_array, 15).should eql(1)
+    end
+
+    it "should return the final index if greater than all items" do
+      @ring.bisect(@test_array, 40).should eql(3)
+    end
+  end
+
+  describe "getting nodes" do
+    describe "without explicit weights" do
+      before do
+        @ring = HashRing.new(['a','b','c'])
+        @consistent_key = 'Hello, World'
+      end
+
+      it "should consistently assign nodes" do
+        first_node = @ring.get_node(@consistent_key)
+        
+        100.times do
+          @ring.get_node(@consistent_key).should eql(first_node)
+        end
+      end
+
+      it "should assign to different nodes" do
+        # Keys chosen specifically from trying on Python code
+        first_node = @ring.get_node('a')
+        second_node = @ring.get_node('b')
+
+        first_node.should_not eql(second_node)
+      end
+
+      it "should assign keys fairly randomly" do
+        counts = {}
+        total_counts = 0
+
+        UNWEIGHTED_RUNS.times do |i|
+          node = @ring.get_node(i.to_s)
+
+          if counts[node].nil?
+            counts[node] = 0
+          else
+            counts[node] += 1
+          end
+
+          total_counts += 1
+        end
+
+        total_keys = counts.keys.length
+        
+        # Should be bounded, hopefully by 1/total_keys (give or take an error bound)
+        ideal_probability = (1.0/total_keys) + UNWEIGHTED_ERROR_BOUND
+        counts.each do |node, count|
+          probability = (count / UNWEIGHTED_RUNS.to_f)
+
+          if probability >= ideal_probability
+            fail "#{node} has probability: #{probability}"
+          end
+        end
+      end
+    end
+
+    describe "with explicit weights" do
+      before do
+        # Create a hash ring with 'a' having a 2:1 weight
+        @weights = { 'a' => 2 }
+        @ring = HashRing.new(['a','b','c'], @weights)
+        @consistent_key = 'Hello, World'
+      end
+
+      it "should still consistently assign nodes" do
+        first_node = @ring.get_node(@consistent_key)
+        
+        100.times do
+          @ring.get_node(@consistent_key).should eql(first_node)
+        end
+      end
+
+      it "should assign to different nodes" do
+        # Keys chosen specifically from trying on Python code
+        first_node = @ring.get_node('a')
+        second_node = @ring.get_node('b')
+
+        first_node.should_not eql(second_node)
+      end
+
+      it "should assign keys fairly randomly, but according to weights" do
+        counts = {}
+        total_counts = 0
+
+        WEIGHTED_RUNS.times do |i|
+          node = @ring.get_node(i.to_s)
+
+          if counts[node].nil?
+            counts[node] = 0
+          else
+            counts[node] += 1
+          end
+
+          total_counts += 1
+        end
+
+        total_keys = counts.keys.length
+        
+        # Should be bounded, hopefully by 1/total_keys (give or take an error bound)
+        ideal_probability = (1.0/total_keys) + WEIGHTED_ERROR_BOUND
+        counts.each do |node, count|
+          weight = @weights[node] || 1
+          probability = (count / WEIGHTED_RUNS.to_f)
+          weighted_probability = ideal_probability * weight
+
+          if probability >= weighted_probability
+            fail "#{node} has probability: #{probability}"
+          end
+        end
+      end
+    end
+  end
+
   describe "hashing methods" do
     before do
       @ring = HashRing.new(['a'])

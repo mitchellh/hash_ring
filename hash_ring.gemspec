@@ -9,7 +9,7 @@ $gemspec = Gem::Specification.new do |s|
  
   s.require_path = 'lib'
   s.has_rdoc = false
-  s.extra_rdoc_files = %w{ README.txt CREDITS.txt }
+  s.extra_rdoc_files = %w{ README.rdoc CREDITS.txt }
  
-  s.files = Dir['lib/**/*.rb'] + Dir['*.txt']
+  s.files = Dir['lib/**/*.rb'] + Dir['*.txt'] + Dir['*.rdoc']
 end

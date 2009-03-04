@@ -1,0 +1,11 @@
+= hash_ring
+
+hash_ring is a pure Ruby implementation of consistent hashing. 
+hash_ring is based on the original Python code written by
+Amir Salihefendic. A comprehensive blog post detailing the methods
+and reasoning for such a library can be viewed by visiting the following
+URL:
+
+http://amix.dk/blog/viewEntry/19367
+
+

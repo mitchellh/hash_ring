@@ -31,6 +31,7 @@ Rake::PackageTask.new('hash_ring', '0.1') do |pkg|
   pkg.package_files = FileList[
     'Rakefile',
     '*.txt',
+    '*.rdoc',
     'lib/**/*',
     'spec/**/*'
   ].to_a

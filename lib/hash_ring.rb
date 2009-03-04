@@ -1,30 +1,45 @@
-#
-#--
+######################################
+# hash_ring
+# Code ported from Python version written by Amir Salihefendic
+######################################
 # Copyright (c) 2009, Mitchell Hashimoto, mitchell.hashimoto@gmail.com
-#
-# Permission is hereby granted, free of charge, to any person obtaining a copy
-# of this software and associated documentation files (the "Software"), to deal
-# in the Software without restriction, including without limitation the rights
-# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-# copies of the Software, and to permit persons to whom the Software is
-# furnished to do so, subject to the following conditions:
-#
-# The above copyright notice and this permission notice shall be included in
-# all copies or substantial portions of the Software.
-#
-# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-# THE SOFTWARE.
-#++
 #
 
 require 'digest/md5'
 
-# TODO: RDOC
+# = HashRing Class
+#
+# == Background
+#
+# Implements consistent hashing that can be used when
+# the number of server nodes can increase or decrease (like in memcached).
+#
+# Consistent hashing is a scheme that provides a hash table functionality
+# in a way that the adding or removing of one slot
+# does not significantly change the mapping of keys to slots.
+#
+# More information about consistent hashing can be read in these articles:
+#
+# "Web Caching with Consistent Hashing":
+#    http://www8.org/w8-papers/2a-webserver/caching/paper2.html
+#
+# "Consistent hashing and random trees:
+#    Distributed caching protocols for relieving hot spots on the World Wide Web (1997)":
+#    http://citeseerx.ist.psu.edu/legacymapper?did=38148
+#
+# == Usage
+#
+#  memcache_servers = ['192.168.0.111:14107',
+#                      '192.168.0.112:14107',
+#                      '192.168.0.113:14108']
+#
+#  # Since server 1 has double the RAM, lets weight it
+#  # twice as much to get twice the keys. This is optional
+#  weights = { '192.168.0.111' => 2 }
+#
+#  ring = HashRing.new(memcache_servers, weights)
+#  server = ring.get_node('my_key')
+#
 class HashRing
   #
   # Creates a HashRing instance
@@ -164,6 +179,7 @@ class HashRing
     return arr.length
   end
   
-  # For testing mainly
-  def sorted_keys; @_sorted_keys; end
+  def sorted_keys #:nodoc:
+    @_sorted_keys
+  end
 end

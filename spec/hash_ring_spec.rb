@@ -1,5 +1,4 @@
-require File.dirname(__FILE__) + '/spec_base'
-require 'digest/md5'
+require File.join(File.dirname(__FILE__), 'spec_base')
 
 # Basic constants
 UNWEIGHTED_RUNS = 1000

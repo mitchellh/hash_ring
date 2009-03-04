@@ -46,6 +46,7 @@ class HashRing
     @weights = weights
 
     self._generate_circle()
+    self
   end
 
   #
@@ -103,6 +104,29 @@ class HashRing
   end
 
   #
+  # Returns an array of nodes where the key could be stored, starting
+  # at the correct position.
+  def iterate_nodes(string_key)
+    returned_values = []
+    pos = self.get_node_pos(string_key)
+    @_sorted_keys[pos, @_sorted_keys.length].each do |ring_index|
+      key = @ring[ring_index]
+      next if returned_values.include?(key)
+      returned_values.push(key)
+    end
+    
+    @_sorted_keys.each_index do |i|
+      break if i >= pos
+
+      key = @ring[@_sorted_keys[i]]
+      next if returned_values.include?(key)
+      returned_values.push(key)      
+    end
+
+    returned_values
+  end
+
+  #
   # Given a string key this returns a long value. This long value
   # represents a location on the ring.
   #
@@ -116,8 +140,8 @@ class HashRing
     return ((b_key[block.call(3)] << 24) | 
             (b_key[block.call(2)] << 16) | 
             (b_key[block.call(1)] << 8) | 
-            (b_key[block.call(0)]))
-  end
+            (b_key[block.call(0)])) 
+ end
 
   #
   # Returns raw MD5 digest given a key

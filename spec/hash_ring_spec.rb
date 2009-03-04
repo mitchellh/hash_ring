@@ -29,6 +29,26 @@ describe HashRing do
     end
   end
 
+  describe "iterating nodes" do
+    before do
+      @ring = HashRing.new(['a','b','c'])
+    end
+
+    it "should return correct values based on python" do
+      a_iterate = @ring.iterate_nodes('a')
+      b_iterate = @ring.iterate_nodes('b')
+      c_iterate = @ring.iterate_nodes('ccccccccc')
+
+      a_python = ["a","c","b"]
+      b_python = ["b","c","a"]
+      c_python = ["c","a","b"]
+
+      (a_iterate - a_python).should be_empty
+      (b_iterate - b_python).should be_empty
+      (c_iterate - c_python).should be_empty
+    end
+  end
+
   describe "getting nodes" do
     def check_consistent_assigns
       first_node = @ring.get_node(@consistent_key)
